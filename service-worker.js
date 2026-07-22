@@ -1,7 +1,7 @@
 // Service Worker – 早睡｜英语口语清单
 // 策略：Network First + 离线缓存回退
 
-const CACHE_NAME = 'zaoshui-english-v5';
+const CACHE_NAME = 'zaoshui-english-v6';
 
 // 需要预缓存的核心文件
 const PRECACHE_ASSETS = [

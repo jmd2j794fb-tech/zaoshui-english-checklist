@@ -266,6 +266,26 @@
     background: var(--green); color: #fff; border-color: var(--green); font-weight: 600;
   }
 
+  /* Reading player */
+  .detail-player { margin-top: 14px; background: #f9fafb; border-radius: 10px; padding: 12px; border: 1px solid var(--border); }
+  .player-speed-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .player-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; white-space: nowrap; }
+  .speed-btns { display: flex; gap: 6px; flex: 1; }
+  .speed-btn {
+    flex: 1; padding: 7px 4px; border-radius: 8px; border: 1px solid var(--border);
+    background: #fff; font-size: 13px; color: var(--text-secondary); cursor: pointer;
+    transition: all 0.15s; -webkit-tap-highlight-color: transparent; text-align: center;
+  }
+  .speed-btn.active { background: var(--green); color: #fff; border-color: var(--green); font-weight: 600; }
+  .speed-btn:active { transform: scale(0.95); }
+  .player-actions { display: flex; gap: 8px; }
+  .player-btn {
+    flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--border);
+    background: #fff; font-size: 14px; cursor: pointer; color: var(--text-secondary);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .player-btn.primary { background: var(--green); color: #fff; border-color: var(--green); font-weight: 600; }
+
   /* Clickable words in reading text */
   .detail-text .word {
     cursor: pointer; border-radius: 3px; padding: 1px 1px;
@@ -1223,9 +1243,19 @@ function renderReadingPage() {
     h += `<div class="detail-phrase-title">🔑 Key Phrases</div>`;
     h += `<div class="detail-phrases">${r.phrases.map(p => `<span>${p}</span>`).join('')}</div>`;
     h += `<div class="detail-chinese">🇨🇳 ${r.chinese}</div>`;
-    h += `<div class="detail-actions">`;
-    h += `<button onclick="event.stopPropagation();markRead(${i})">✅ 标记已读</button>`;
-    h += `<button class="primary" onclick="event.stopPropagation();speakText(${i})">🔊 朗读全文</button>`;
+    h += `<div class="detail-player">`;
+    h += `<div class="player-speed-row">`;
+    h += `<span class="player-label">⚡ 语速</span>`;
+    h += `<div class="speed-btns">`;
+    h += `<button class="speed-btn" data-speed="0.5" onclick="event.stopPropagation();setSpeed(0.5,${i})">0.5x</button>`;
+    h += `<button class="speed-btn" data-speed="0.8" onclick="event.stopPropagation();setSpeed(0.8,${i})">0.8x</button>`;
+    h += `<button class="speed-btn active" data-speed="1" onclick="event.stopPropagation();setSpeed(1,${i})">1x</button>`;
+    h += `<button class="speed-btn" data-speed="1.5" onclick="event.stopPropagation();setSpeed(1.5,${i})">1.5x</button>`;
+    h += `</div></div>`;
+    h += `<div class="player-actions">`;
+    h += `<button class="player-btn" onclick="event.stopPropagation();markRead(${i})">✅ 标记已读</button>`;
+    h += `<button class="player-btn primary" id="playBtn${i}" onclick="event.stopPropagation();togglePlay(${i})">▶️ 朗读</button>`;
+    h += `</div>`;
     h += `</div>`;
     h += `</div></div>`;
     h += `</div>`;
@@ -1253,20 +1283,56 @@ function markRead(i) {
 }
 window.markRead = markRead;
 
+let currentSpeed = 1;
+let currentPlayingIdx = -1;
+
+function setSpeed(speed, i) {
+  currentSpeed = speed;
+  // Update active button visually
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  const btns = document.querySelectorAll(`#article-detail-${i} .speed-btn`);
+  btns.forEach(b => { if (parseFloat(b.dataset.speed) === speed) b.classList.add('active'); });
+  // If currently playing, restart with new speed
+  if (currentPlayingIdx === i && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    speakText(i);
+  }
+}
+
+function togglePlay(i) {
+  if (currentPlayingIdx === i && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    currentPlayingIdx = -1;
+    const btn = document.getElementById('playBtn' + i);
+    if (btn) btn.innerHTML = '▶️ 朗读';
+    return;
+  }
+  speakText(i);
+}
+
 function speakText(i) {
   const r = readingData[i];
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(r.text);
     u.lang = 'en-US';
-    u.rate = 0.9;
+    u.rate = currentSpeed;
+    u.onend = function() {
+      currentPlayingIdx = -1;
+      const btn = document.getElementById('playBtn' + i);
+      if (btn) btn.innerHTML = '▶️ 朗读';
+    };
+    currentPlayingIdx = i;
+    const btn = document.getElementById('playBtn' + i);
+    if (btn) btn.innerHTML = '⏸️ 停止';
     window.speechSynthesis.speak(u);
-    showToast('🔊 正在朗读...');
   } else {
     showToast('⚠️ 浏览器不支持语音朗读');
   }
 }
 window.speakText = speakText;
+window.setSpeed = setSpeed;
+window.togglePlay = togglePlay;
 
 // ── INIT ──────────────────────────────────
 function init() { loadState(); renderAll(); renderReadingPage(); updateVocabFab(); if ('Notification' in window && Notification.permission==='granted') scheduleNotifications(); }
