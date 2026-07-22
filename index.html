@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>早睡｜英语口语清单</title>
+<meta name="description" content="英语口语第一阶段自动化学习清单 · 仅用轻听英语 · 4周破冰期">
+<meta name="theme-color" content="#2d9a6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="口语清单">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --card: #fff;
+    --text: #1a1a2e;
+    --text-secondary: #666;
+    --border: #eef0f4;
+    --green: #2d9a6b;
+    --green-light: #eaf7f1;
+    --green-dark: #1b4332;
+    --yellow: #c4862b;
+    --yellow-light: #fef9ee;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg); color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: calc(80px + var(--safe-bottom));
+    max-width: 500px; margin: 0 auto; min-height: 100vh;
+  }
+  /* ── Tab Bar ── */
+  .tab-bar {
+    display: flex; background: #fff; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10; padding-top: var(--safe-top);
+  }
+  .tab-item {
+    flex:1; text-align:center; padding:12px 4px 10px; font-size:13px; color:var(--text-secondary);
+    cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab-item .tab-icon { font-size:18px; }
+  .tab-item.active { color:var(--green); border-bottom-color:var(--green); font-weight:600; }
+  .tab-page { display:none; }
+  .tab-page.active { display:block; }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #1a3a2a 0%, #2d6a4f 50%, #1b4332 100%);
+    color:#fff; padding:20px 20px;
+  }
+  .header .phase-badge { display:inline-block; font-size:11px; font-weight:600; padding:4px 10px; border-radius:10px; background:rgba(255,255,255,0.2); margin-bottom:8px; }
+  .header h1 { font-size:20px; font-weight:700; margin-bottom:4px; }
+  .header .subtitle { font-size:13px; opacity:0.8; }
+
+  /* ── Progress ── */
+  .progress-wrap { padding:16px 20px; background:#fff; border-bottom:1px solid var(--border); }
+  .progress-info { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .progress-info .progress-pct { font-size:22px; font-weight:700; color:var(--green); }
+  .progress-info .progress-label { font-size:13px; color:var(--text-secondary); }
+  .progress-bar-wrap { height:6px; background:#e9ecef; border-radius:3px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:var(--green); border-radius:3px; transition:width 0.4s ease; }
+
+  /* ── Content ── */
+  .content { padding:12px 16px 0; }
+
+  .week-section { margin-bottom:20px; }
+  .week-header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .week-num {
+    width:36px; height:36px; border-radius:10px; background:var(--green-light); color:var(--green);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;
+  }
+  .week-header .week-info h3 { font-size:15px; font-weight:600; }
+  .week-header .week-info span { font-size:12px; color:var(--text-secondary); }
+  .week-stats { display:flex; gap:6px; font-size:11px; color:var(--text-secondary); margin-left:auto; }
+  .week-stats span { background:#f5f5f5; padding:2px 8px; border-radius:8px; white-space:nowrap; }
+
+  .week-material {
+    display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-secondary);
+    margin-bottom:12px; padding:8px 12px; background:#f9fafb; border-radius:8px; border:1px dashed #e0e0e0;
+  }
+  .week-material .mat-icon { font-size:16px; }
+  .week-material .mat-tag { font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; background:var(--green-light); color:var(--green); white-space:nowrap; }
+
+  .day-card {
+    background:#fff; border-radius:var(--radius); padding:14px; margin-bottom:8px;
+    border:1px solid var(--border); box-shadow:var(--shadow); transition:all 0.2s;
+  }
+  .day-card.completed { opacity:0.5; }
+  .day-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .day-check {
+    width:24px; height:24px; border-radius:50%; border:2px solid #ddd; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:all 0.2s; font-size:12px; color:transparent;
+  }
+  .day-check.checked { background:var(--green); border-color:var(--green); color:#fff; }
+  .day-label { flex:1; }
+  .day-label .day-name { font-size:14px; font-weight:600; }
+  .day-label .day-topic { font-size:11px; color:var(--text-secondary); }
+  .day-badge { font-size:10px; font-weight:600; padding:2px 8px; border-radius:8px; background:var(--green-light); color:var(--green); white-space:nowrap; }
+
+  .task-list { list-style:none; }
+  .task-item { display:flex; align-items:flex-start; gap:10px; padding:6px 0; font-size:13px; line-height:1.5; cursor:pointer; transition:color 0.2s; }
+  .task-item.done { color:#bbb; text-decoration:line-through; }
+  .task-checkbox {
+    width:20px; height:20px; border-radius:6px; border:2px solid #ddd; flex-shrink:0;
+    margin-top:1px; display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s; font-size:11px; color:transparent;
+  }
+  .task-checkbox.checked { background:var(--green); border-color:var(--green); color:#fff; }
+  .task-text { flex:1; }
+  .task-time { font-size:10px; color:#aaa; background:#f7f7f7; padding:1px 7px; border-radius:6px; flex-shrink:0; white-space:nowrap; }
+  .task-hint { font-size:10px; color:#bbb; display:block; margin-top:2px; }
+
+  /* ── Materials Page ── */
+  .mat-section { margin-bottom:24px; }
+  .mat-section h3 { font-size:16px; font-weight:600; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .mat-card {
+    background:#fff; border-radius:var(--radius); padding:16px; margin-bottom:10px;
+    border:1px solid var(--border); box-shadow:var(--shadow);
+  }
+  .mat-card .mat-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
+  .mat-card .mat-icon-big { font-size:32px; flex-shrink:0; line-height:1; }
+  .mat-card .mat-info h4 { font-size:15px; font-weight:600; margin-bottom:2px; }
+  .mat-card .mat-info .mat-desc { font-size:12px; color:var(--text-secondary); line-height:1.5; }
+  .mat-card .mat-meta { display:flex; gap:6px; flex-wrap:wrap; }
+  .mat-card .mat-meta span { font-size:11px; padding:3px 8px; border-radius:6px; background:#f5f5f5; color:#888; }
+  .mat-card .mat-meta span.highlight { background:var(--green-light); color:var(--green); font-weight:500; }
+  .mat-table { width:100%; font-size:12px; border-collapse:collapse; margin-top:8px; }
+  .mat-table th, .mat-table td { padding:8px; text-align:left; border-bottom:1px solid #eee; }
+  .mat-table th { background:#f9fafb; color:var(--text-secondary); font-weight:600; }
+  .highlight-box { background:var(--green-light); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--green-dark); margin-top:8px; line-height:1.5; }
+
+  /* ── Methods Page ── */
+  .method-card {
+    background:#fff; border-radius:var(--radius); padding:18px; margin-bottom:12px;
+    border:1px solid var(--border); box-shadow:var(--shadow);
+  }
+  .method-card h4 { font-size:15px; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .method-steps { list-style:none; counter-reset:step; }
+  .method-steps li {
+    counter-increment:step; padding:6px 0 6px 28px; position:relative;
+    font-size:13px; line-height:1.5; color:#444;
+  }
+  .method-steps li::before {
+    content:counter(step); position:absolute; left:0; top:7px;
+    width:20px; height:20px; border-radius:50%; background:var(--green-light); color:var(--green);
+    font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ── Bottom Bar ── */
+  .bottom-bar {
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:500px; background:#fff; border-top:1px solid var(--border);
+    padding:12px 16px calc(12px + var(--safe-bottom));
+    display:flex; align-items:center; gap:10px; z-index:10;
+  }
+  .bottom-bar .today-status { flex:1; }
+  .bottom-bar .today-status .status-title { font-size:12px; color:var(--text-secondary); }
+  .bottom-bar .today-status .status-day { font-size:14px; font-weight:600; }
+  .btn-reset {
+    padding:10px 16px; border-radius:10px; border:1px solid var(--border);
+    background:#fff; font-size:13px; cursor:pointer; color:var(--text-secondary);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-reset:active { background:#f5f5f5; }
+  .btn-notify {
+    padding:10px 16px; border-radius:10px; border:none; background:var(--green);
+    color:#fff; font-size:13px; font-weight:600; cursor:pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-notify:active { background:#258059; }
+
+  /* ── Toast ── */
+  .toast {
+    position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-120px);
+    background:#1a1a2e; color:#fff; padding:10px 20px; border-radius:20px;
+    font-size:13px; z-index:999; transition:transform 0.3s ease; pointer-events:none; white-space:nowrap;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transition:all 0.3s;
+  }
+  .modal-overlay.active { opacity:1; visibility:visible; }
+  .modal {
+    background:#fff; border-radius:16px; padding:24px; width:90%; max-width:340px; text-align:center;
+  }
+  .modal h3 { font-size:16px; margin-bottom:8px; }
+  .modal p { font-size:13px; color:var(--text-secondary); margin-bottom:20px; }
+  .modal .modal-actions { display:flex; gap:10px; }
+  .btn-cancel { flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); background:#fff; font-size:14px; cursor:pointer; }
+  .btn-confirm { flex:1; padding:10px; border-radius:10px; border:none; background:var(--green); color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
+
+  /* ── Install Banner ── */
+  .install-banner {
+    background:var(--green-light); border:1px solid #a3d9c1; border-radius:var(--radius);
+    padding:12px 16px; margin:0 16px 12px; display:flex; align-items:center; gap:10px;
+    font-size:13px; cursor:pointer; animation:slideDown 0.4s ease;
+  }
+  .install-banner.hidden { display:none; }
+  .install-banner .inst-icon { font-size:24px; flex-shrink:0; }
+  .install-banner .inst-text { flex:1; }
+  .install-banner .inst-text strong { display:block; font-size:14px; margin-bottom:2px; }
+  .install-banner .inst-close { font-size:18px; padding:4px; color:#888; cursor:pointer; background:none; border:none; }
+
+  @keyframes popIn { 0% { transform:scale(0.8); opacity:0; } 100% { transform:scale(1); opacity:1; } }
+  @keyframes slideDown { from { transform:translateY(-20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+  .pop { animation:popIn 0.3s ease; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ TAB BAR ═══════════ -->
+<div class="tab-bar">
+  <div class="tab-item active" data-tab="checklist"><span class="tab-icon">✅</span><span>每日清单</span></div>
+  <div class="tab-item" data-tab="materials"><span class="tab-icon">📀</span><span>学习素材</span></div>
+  <div class="tab-item" data-tab="methods"><span class="tab-icon">🧪</span><span>跟读方法</span></div>
+</div>
+
+<!-- ═══════════ PAGE 1: CHECKLIST ═══════════ -->
+<div class="tab-page active" id="page-checklist">
+  <div class="header">
+    <span class="phase-badge">🟢 第 1 阶段 · 破冰期</span>
+    <h1>英语口语自动化清单</h1>
+    <p class="subtitle">第 1–4 周 · 仅用轻听英语 · 每天 30 分钟</p>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-info"><span class="progress-label">整体进度</span><span class="progress-pct" id="progressPct">0%</span></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+  </div>
+  <div id="installBanner" class="install-banner hidden" onclick="installPWA()">
+    <span class="inst-icon">📲</span>
+    <span class="inst-text"><strong>添加到主屏幕</strong>像 App 一样使用，离线也能查看</span>
+    <button class="inst-close" onclick="event.stopPropagation();dismissInstall()">✕</button>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- ═══════════ PAGE 2: MATERIALS ═══════════ -->
+<div class="tab-page" id="page-materials">
+  <div class="header">
+    <span class="phase-badge">📀 素材库</span>
+    <h1>轻听英语 · 第一阶段素材</h1>
+    <p class="subtitle">在轻听英语 App 中搜索以下关键词即可找到</p>
+  </div>
+  <div class="content">
+
+    <div class="mat-section">
+      <h3>🎤 跟读素材（主菜）</h3>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <span class="mat-icon-big">🇬🇧</span>
+          <div class="mat-info">
+            <h4>BBC 6 Minute English</h4>
+            <p class="mat-desc">每集 6 分钟，双人对话，话题日常。语速适中，最适合破冰期跟读。有完整中英双语课文。</p>
+          </div>
+        </div>
+        <div class="mat-meta"><span class="highlight">⭐ 首选</span><span>⏱️ 6 分钟/集</span><span>🔊 中速</span><span>📝 有课文</span></div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <span class="mat-icon-big">🎓</span>
+          <div class="mat-info">
+            <h4>BBC Learning English</h4>
+            <p class="mat-desc">BBC 官方学习频道，内容专门为学习者设计。语速偏慢，讲解清晰，比 6 Minute English 更适合完全零基础。</p>
+          </div>
+        </div>
+        <div class="mat-meta"><span class="highlight">⭐ 首选</span><span>⏱️ 3–6 分钟</span><span>🔊 中慢</span><span>📝 有课文</span></div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <span class="mat-icon-big">🇺🇸</span>
+          <div class="mat-info">
+            <h4>VOA Special English</h4>
+            <p class="mat-desc">美国之音慢速英语新闻，词汇量控制在 1500 词以内，语速约 90 词/分钟。适合前两周适应期和周日泛听。</p>
+          </div>
+        </div>
+        <div class="mat-meta"><span>🔹 备选</span><span>⏱️ 3–5 分钟</span><span>🔊 慢速</span><span>📝 有课文</span></div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <span class="mat-icon-big">🇨🇳</span>
+          <div class="mat-info">
+            <h4>CRI · China Radio International</h4>
+            <p class="mat-desc">中国国际广播电台英文频道。话题涉及中国文化、时事，内容熟悉易理解，适合泛听磨耳朵。</p>
+          </div>
+        </div>
+        <div class="mat-meta"><span>🔹 备选</span><span>⏱️ 不定</span><span>🔊 中速</span><span>📝 有课文</span></div>
+      </div>
+    </div>
+
+    <div class="mat-section">
+      <h3>🎬 影视跟读素材（周六趣味训练）</h3>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <span class="mat-icon-big">☕</span>
+          <div class="mat-info">
+            <h4>Friends · 老友记</h4>
+            <p class="mat-desc">经典美剧，日常对话为主，句子短小精悍。推荐 Central Perk 咖啡馆场景，社交闲聊句型丰富。</p>
+          </div>
+        </div>
+        <div class="mat-meta"><span class="highlight">⭐ 首选</span><span>难度 ★★☆</span><span>🗣️ 社交用语</span></div>
+        <div class="highlight-box">💡 <strong>怎么找</strong>：轻听英语 → 影视原声 → 搜索「Friends」→ 选 1–2 分钟日常对话片段</div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <span class="mat-icon-big">👨‍👩‍👧‍👦</span>
+          <div class="mat-info">
+            <h4>Modern Family · 摩登家庭</h4>
+            <p class="mat-desc">伪纪录片风格的家庭喜剧，语速适中，场景生活化。从第 3 周开始用，学习不同角色的语气变化。</p>
+          </div>
+        </div>
+        <div class="mat-meta"><span>🔹 第 3 周起</span><span>难度 ★★☆</span><span>🗣️ 家庭对话</span></div>
+        <div class="highlight-box">💡 <strong>怎么找</strong>：轻听英语 → 影视原声 → 搜索「Modern Family」→ 选户外或家庭场景</div>
+      </div>
+    </div>
+
+    <div class="mat-section">
+      <h3>📋 4 周素材使用规划</h3>
+      <div class="mat-card">
+        <table class="mat-table">
+          <thead><tr><th>周次</th><th>主素材</th><th>语速</th><th>周六</th></tr></thead>
+          <tbody>
+            <tr><td>W1</td><td>BBC 6 Min × 1 集</td><td>0.8x</td><td>Friends</td></tr>
+            <tr><td>W2</td><td>BBC 6 Min × 2 + VOA</td><td>0.8x → 1.0x</td><td>Friends</td></tr>
+            <tr><td>W3</td><td>BBC 6 Min × 2 + VOA 常速</td><td>1.0x</td><td>Modern Family</td></tr>
+            <tr><td>W4</td><td>BBC + Friends + 复习</td><td>1.0x</td><td>Friends / MF</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mat-section">
+      <h3>⚙️ 轻听英语 · 核心功能速查</h3>
+      <div class="mat-card">
+        <div class="mat-meta" style="margin-bottom:8px;">
+          <span class="highlight">🎤 跟读测评</span><span>🔂 逐句精听</span><span>⏩ 变速播放</span>
+          <span>📖 双语课文</span><span>⭐ 收藏句子</span><span>📚 长按查词</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
+          播放页底部按钮依次对应以上功能。跟读测评会 AI 打分并对比原音；
+          逐句精听可设置循环次数和间隔；变速支持 0.6x–1.5x 九档。
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ PAGE 3: METHODS ═══════════ -->
+<div class="tab-page" id="page-methods">
+  <div class="header">
+    <span class="phase-badge">🧪 方法库</span>
+    <h1>核心跟读方法</h1>
+    <p class="subtitle">掌握这 3 个方法，口语练习效率翻倍</p>
+  </div>
+  <div class="content">
+
+    <div class="method-card">
+      <h4>🎙️ Shadowing 影子跟读法（每日必做）</h4>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">跟读不是"听一遍跟一遍"，而是<strong>几乎同步</strong>地模仿母语者的语音语调。</p>
+      <ol class="method-steps">
+        <li><strong>盲听 1 遍</strong>：关掉课文，不开字幕，感受整体节奏</li>
+        <li><strong>看课文听 1 遍</strong>：打开双语课文，长按标记不熟悉的词</li>
+        <li><strong>逐句跟读 3 遍</strong>：开启逐句精听，用跟读测评模仿到高分</li>
+        <li><strong>同步跟读 2 遍</strong>：关闭逐句模式，和原音几乎同时说</li>
+        <li><strong>脱稿跟读 1 遍</strong>：关掉课文，只听不说，在脑海里跟</li>
+      </ol>
+      <div class="highlight-box">🎯 <strong>重点模仿</strong>：① 连读（got to → gotta）② 重音 ③ 语调升降 ④ 停顿节奏</div>
+    </div>
+
+    <div class="method-card">
+      <h4>⏱️ 4/3/2 流利度训练法（第 3–4 周）</h4>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">来自语言学研究者 Maurice Taube 的经典方法，专门提升口语流利度。</p>
+      <ol class="method-steps">
+        <li>选一个熟悉的话题，<strong>讲 4 分钟</strong>（可以慢、可以卡）</li>
+        <li>换一个听众（或假装换），<strong>讲 3 分钟</strong>（同样的内容）</li>
+        <li>再换，<strong>讲 2 分钟</strong>（同样的内容）</li>
+      </ol>
+      <div class="highlight-box">💡 同样内容越说越快，大脑会自动优化表达路径，流利度自然提升。</div>
+    </div>
+
+    <div class="method-card">
+      <h4>🎧 录音回听法（每天必做）</h4>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">说话时你听到的自己的声音和别人听到的不同（骨传导 vs 空气传导），录音能让你<strong>真实地</strong>听到自己的问题。</p>
+      <ol class="method-steps">
+        <li>每天选一个话题，连续说 <strong>1 分钟</strong>（不许停、不许改）</li>
+        <li>录音，回听，标记：① 发音错的词 ② 卡壳处 ③ 语法错误</li>
+        <li>针对问题再说一遍，再录</li>
+        <li>保存所有录音，每周日对比一次</li>
+      </ol>
+    </div>
+
+    <div class="method-card">
+      <h4>🧩 词块（Chunk）积累法</h4>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">不要背单个单词，在轻听英语中收藏完整句子。</p>
+      <table class="mat-table">
+        <thead><tr><th>❌ 不要这样</th><th>✅ 应该这样</th></tr></thead>
+        <tbody>
+          <tr><td>decision = 决定</td><td><strong>make a quick decision</strong></td></tr>
+          <tr><td>available = 可获得的</td><td><strong>I'm available on Tuesday</strong></td></tr>
+          <tr><td>experience = 经验</td><td><strong>I have experience in...</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="highlight-box" style="margin-top:10px;">💡 <strong>操作</strong>：轻听英语课文中长按句子 → 收藏到句库 → 每天大声朗读本周收藏的所有句子</div>
+    </div>
+
+    <div class="method-card">
+      <h4>🧠 建立英语思维的 3 个训练</h4>
+      <ol class="method-steps">
+        <li><strong>"不翻译"训练</strong>：看到东西直接说英文名，不许先想中文。从杯子 cup、键盘 keyboard 开始。</li>
+        <li><strong>5W 复述法</strong>：听完一段内容，用 Who / What / When / Where / Why 自问自答。</li>
+        <li><strong>场景自言自语</strong>：走路/做饭/通勤时用英语描述正在做的事，想到什么说什么，不许停。</li>
+      </ol>
+    </div>
+
+    <div class="method-card">
+      <h4>🗣️ 自言自语话题库（28 天全）</h4>
+      <table class="mat-table">
+        <thead><tr><th>周</th><th>周一–周日话题</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:700;">W1</td><td>Morning routine → What I ate → Typical day → Favorite hobby → Best of week → 模仿台词 → 自由</td></tr>
+          <tr><td style="font-weight:700;">W2</td><td>Weekend plan → A place to visit → Daily routine → Favorite movie → Learned this week → 模仿 → 自由</td></tr>
+          <tr><td style="font-weight:700;">W3</td><td>A person I admire → Dream job → My hometown → Memorable experience → What I'm grateful for → 模仿 → 自由</td></tr>
+          <tr><td style="font-weight:700;">W4</td><td>What I do for fun → Goals next month → Skill to learn → 复习 → 4/3/2训练 → 配音 → 英语总结</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ BOTTOM BAR ═══════════ -->
+<div class="bottom-bar">
+  <div class="today-status">
+    <div class="status-title">今日任务</div>
+    <div class="status-day" id="todayStatus">加载中...</div>
+  </div>
+  <button class="btn-reset" onclick="showResetModal()">重置</button>
+  <button class="btn-notify" onclick="requestNotification()">🔔 提醒</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Reset Modal -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <h3>🗑️ 重置所有进度？</h3>
+    <p>这将清除所有已完成的标记，恢复到第 1 天。此操作不可撤销。</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeResetModal()">取消</button>
+      <button class="btn-confirm" onclick="resetAll()">确认重置</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+// ── PWA Install ──────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt = e;
+  const b = document.getElementById('installBanner');
+  if (b && !localStorage.getItem('install_dismissed')) b.classList.remove('hidden');
+});
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('installBanner').classList.add('hidden'); });
+  } else { showToast('📲 在浏览器菜单中选择「添加到主屏幕」'); }
+}
+function dismissInstall() { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('install_dismissed','1'); }
+window.installPWA = installPWA; window.dismissInstall = dismissInstall;
+
+// ── Tabs ────────────────────────────────
+document.querySelectorAll('.tab-item').forEach(t => {
+  t.addEventListener('click', function() {
+    document.querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-page').forEach(x => x.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('page-' + this.dataset.tab).classList.add('active');
+  });
+});
+
+// ── DATA ────────────────────────────────
+const weekData = [
+  { week:1, title:'适应期 · 建立节奏', focus:'BBC 6 Minute English × 1 集（反复练）',
+    material:{ icon:'🇬🇧', tag:'BBC 6 Min ×1', text:'轻听英语搜索「BBC 6 Minute English」下载一集' },
+    days:[
+      { day:'周一', topic:'My morning routine', badge:'0.8x 速',
+        tasks:[
+          { text:'轻听英语搜索「BBC 6 Minute English」，下载一集', time:'准备', hint:'' },
+          { text:'盲听 1 遍（关课文，0.8x 速，感受节奏）', time:'3 min', hint:'' },
+          { text:'逐句精听 + 跟读测评，每句练到评分 > 70', time:'10 min', hint:'重点模仿连读和语调' },
+          { text:'手机录音：说 1 分钟「My morning routine」', time:'10 min', hint:'用 I usually... / First, I... / Then I...' },
+          { text:'回听录音，标记 3 个问题（发音/卡壳/语法）', time:'5 min', hint:'' },
+          { text:'收藏 5 个好句子到轻听英语句库', time:'2 min', hint:'' }] },
+      { day:'周二', topic:'What I had for lunch', badge:'评分 > 80',
+        tasks:[
+          { text:'继续练同一集 BBC 6 Minute English', time:'', hint:'' },
+          { text:'逐句精听 + 跟读测评，目标评分 > 80', time:'12 min', hint:'比昨天更进一步' },
+          { text:'同步跟读 2 遍（不暂停，和原音同时说）', time:'5 min', hint:'' },
+          { text:'手机录音：说 1 分钟「What I had for lunch」', time:'8 min', hint:'用 For lunch I had... / It tasted...' },
+          { text:'用昨天收藏的 5 个句子各仿造一个新句', time:'5 min', hint:'' }] },
+      { day:'周三', topic:'My typical day', badge:'关课文',
+        tasks:[
+          { text:'同一集，脱稿跟读（关掉课文，只听不说，脑海里跟）', time:'5 min', hint:'' },
+          { text:'逐句精听 + 跟读测评，重点练昨天评分低的句子', time:'10 min', hint:'' },
+          { text:'手机录音：说 1 分钟「My typical day」', time:'10 min', hint:'用 I work/study at... / After that, I...' },
+          { text:'回听录音，对比周一的录音找进步', time:'5 min', hint:'你会发现已经有进步了！' }] },
+      { day:'周四', topic:'My favorite hobby', badge:'新内容',
+        tasks:[
+          { text:'换一集新的 BBC 6 Minute English，下载', time:'准备', hint:'' },
+          { text:'盲听 1 遍（0.8x 速，关课文）', time:'3 min', hint:'' },
+          { text:'逐句精听 + 跟读测评，每句评分 > 70', time:'10 min', hint:'' },
+          { text:'手机录音：说 1 分钟「My favorite hobby」', time:'10 min', hint:'用 I enjoy... because...' },
+          { text:'收藏 5 个好句子', time:'2 min', hint:'' }] },
+      { day:'周五', topic:'Best part of my week', badge:'巩固',
+        tasks:[
+          { text:'继续练周四那集，逐句精听 + 跟读测评', time:'10 min', hint:'目标评分 > 80' },
+          { text:'同步跟读 + 脱稿跟读各 1 遍', time:'5 min', hint:'' },
+          { text:'手机录音：说 1 分钟「Best part of my week」', time:'10 min', hint:'用 The best thing was... / I felt... when...' },
+          { text:'用本周收藏的句子仿造新句 × 5', time:'5 min', hint:'' }] },
+      { day:'周六', topic:'模仿角色台词', badge:'趣味训练',
+        tasks:[
+          { text:'轻听英语 → 影视原声 → 搜索「Friends」，选 1 分钟片段', time:'准备', hint:'推荐 Central Perk 咖啡馆场���' },
+          { text:'逐句跟读模仿，注意语气和情绪', time:'10 min', hint:'夸张一点，越像越好玩' },
+          { text:'尝试不看字幕，自己给角色配音', time:'5 min', hint:'' },
+          { text:'手机录音：模仿一段角色台词', time:'10 min', hint:'' },
+          { text:'自由话题自言自语 1 分钟', time:'5 min', hint:'想到什么说什么，不许停' }] },
+      { day:'周日', topic:'自由话题', badge:'轻松日',
+        tasks:[
+          { text:'轻听英语 → VOA Special English 泛听一集', time:'10 min', hint:'不精听，轻松听' },
+          { text:'回听本周所有录音，标记进步最大的地方', time:'10 min', hint:'对比周一和周六的录音' },
+          { text:'自由话题自言自语 1 分钟', time:'5 min', hint:'' },
+          { text:'整理本周句库，大声朗读收藏的所有句子', time:'5 min', hint:'' }] }
+    ] },
+  { week:2, title:'提速期 · 扩大输入', focus:'BBC 6 Minute English × 2 集 + VOA 泛听',
+    material:{ icon:'🇬🇧', tag:'BBC 6 Min ×2 + VOA', text:'轻听英语搜索「BBC 6 Minute English」+「VOA Special English」' },
+    days:[
+      { day:'周一', topic:'My weekend plan', badge:'新集',
+        tasks:[
+          { text:'新一集 BBC 6 Minute English，盲听 1 遍', time:'3 min', hint:'' },
+          { text:'逐句精听 + 跟读测评，评分 > 70', time:'12 min', hint:'尝试 1.0x 原速' },
+          { text:'手机录音：「My weekend plan」1 分钟', time:'10 min', hint:'用 I\'m going to... / I\'m looking forward to...' },
+          { text:'收藏 5 个好句子', time:'5 min', hint:'' }] },
+      { day:'周二', topic:'A place I want to visit', badge:'评分 > 80',
+        tasks:[
+          { text:'同一集，逐句精听 + 跟读测评，评分 > 80', time:'12 min', hint:'' },
+          { text:'同步跟读 2 遍', time:'5 min', hint:'' },
+          { text:'手机录音：「A place I want to visit」1 分钟', time:'10 min', hint:'用 I\'ve always wanted to go to...' },
+          { text:'仿造新句 × 5', time:'3 min', hint:'' }] },
+      { day:'周三', topic:'My daily routine', badge:'关课文',
+        tasks:[
+          { text:'同一集，脱稿跟读', time:'5 min', hint:'' },
+          { text:'换新一集 BBC 6 Minute English，盲听 + 逐句精听', time:'12 min', hint:'' },
+          { text:'手机录音：「My daily routine」1 分钟', time:'10 min', hint:'尝试说得更流利，减少卡壳' },
+          { text:'对比第 1 周周三录音', time:'3 min', hint:'' }] },
+      { day:'周四', topic:'My favorite movie/book', badge:'1.0x 原速',
+        tasks:[
+          { text:'BBC 6 Minute English 逐句精听 + 跟读，尝试 1.0x 原速', time:'12 min', hint:'' },
+          { text:'手机录音：「My favorite movie/book」1 分钟', time:'10 min', hint:'用 My favorite... is... / I like it because...' },
+          { text:'收藏 5 个好句子', time:'5 min', hint:'' },
+          { text:'仿造新句 × 5', time:'3 min', hint:'' }] },
+      { day:'周五', topic:'Something I learned this week', badge:'巩固',
+        tasks:[
+          { text:'本周两集内容，逐句精听复习', time:'10 min', hint:'' },
+          { text:'跟读测评，挑战评分 > 85', time:'5 min', hint:'' },
+          { text:'手机录音：「Something I learned this week」1 分钟', time:'10 min', hint:'用 This week I learned...' },
+          { text:'用本周收藏句子仿造新句 × 5', time:'5 min', hint:'' }] },
+      { day:'周六', topic:'影视模仿', badge:'趣��训练',
+        tasks:[
+          { text:'轻听英语 → 影视原声 → Friends，选新片段 1–2 分钟', time:'准备', hint:'' },
+          { text:'逐句跟读模仿，夸张模仿语气', time:'10 min', hint:'' },
+          { text:'尝试不看字幕配音', time:'5 min', hint:'' },
+          { text:'手机录音：模仿一段角色对话', time:'10 min', hint:'' },
+          { text:'自由话题自言自语 1 分钟', time:'5 min', hint:'' }] },
+      { day:'周日', topic:'自由话题', badge:'轻松日',
+        tasks:[
+          { text:'轻听英语 → VOA Special English 泛听', time:'10 min', hint:'' },
+          { text:'回听本周录音，对比第 1 周', time:'10 min', hint:'' },
+          { text:'大声朗读本周收藏的所有句子', time:'5 min', hint:'' },
+          { text:'自由话题自言自语 1 分钟', time:'5 min', hint:'' }] }
+    ] },
+  { week:3, title:'加速期 · 提升流利度', focus:'BBC 6 Minute English × 2 集 + VOA 常速 + 影视',
+    material:{ icon:'🇬🇧', tag:'BBC 6 Min ×2 + VOA常速 + MF', text:'轻听英语搜索「BBC 6 Minute English」+「Modern Family」' },
+    days:[
+      { day:'周一', topic:'A person I admire', badge:'1.0x 速',
+        tasks:[
+          { text:'新一集 BBC 6 Minute English，1.0x 原速盲听', time:'3 min', hint:'' },
+          { text:'逐句精听 + 跟读测评，评分 > 75', time:'12 min', hint:'适应原速' },
+          { text:'手机录音：「A person I admire」1 分钟', time:'10 min', hint:'用 I look up to... / What I like about them is...' },
+          { text:'收藏 5 个好句子', time:'5 min', hint:'' }] },
+      { day:'周二', topic:'My dream job', badge:'评分 > 85',
+        tasks:[
+          { text:'同一集，逐句精听 + 跟读测评，挑战评分 > 85', time:'12 min', hint:'' },
+          { text:'同步跟读 2 遍（原速）', time:'5 min', hint:'' },
+          { text:'手机录音：「My dream job」1 分钟', time:'10 min', hint:'用 I\'ve always wanted to be... / The reason is...' },
+          { text:'仿造新句 × 5', time:'3 min', hint:'' }] },
+      { day:'周三', topic:'My hometown', badge:'新集',
+        tasks:[
+          { text:'换新一集 BBC 6 Minute English，盲听 + 逐句精听', time:'15 min', hint:'' },
+          { text:'手机录音：「My hometown」1 分钟', time:'10 min', hint:'用 I\'m from... / It\'s known for...' },
+          { text:'对比第 1 周录音找进步', time:'5 min', hint:'' }] },
+      { day:'周四', topic:'A memorable experience', badge:'1.0x 速',
+        tasks:[
+          { text:'BBC 逐句精听 + 跟读，原速练习', time:'12 min', hint:'' },
+          { text:'手机录音：「A memorable experience」1 分钟', time:'10 min', hint:'用 One time I... / It was...' },
+          { text:'收藏 5 个好句子 + 仿造新句', time:'8 min', hint:'' }] },
+      { day:'周五', topic:'What I\'m grateful for', badge:'巩固',
+        tasks:[
+          { text:'本周两集内容复习，跟读测评挑战 > 85', time:'10 min', hint:'' },
+          { text:'尝试 4/3/2 流利度训练法（选一个话题讲 4→3→2 分钟）', time:'10 min', hint:'同样内容越说越快' },
+          { text:'手机录音：「What I\'m grateful for」', time:'10 min', hint:'' }] },
+      { day:'周六', topic:'影视模仿', badge:'挑战',
+        tasks:[
+          { text:'轻听英语 → 影视原声 → Modern Family，选 2 分钟片段', time:'准备', hint:'尝试新剧集' },
+          { text:'逐句跟读模仿，注意不同角色的语气差异', time:'10 min', hint:'' },
+          { text:'尝试不看字幕配音', time:'5 min', hint:'' },
+          { text:'手机录音：模仿对话', time:'10 min', hint:'' },
+          { text:'自由话题自言自语 2 分钟', time:'5 min', hint:'挑战说更久！' }] },
+      { day:'周日', topic:'自由话题', badge:'轻松日',
+        tasks:[
+          { text:'轻听英语 → VOA 常速新闻泛听', time:'10 min', hint:'挑战常速' },
+          { text:'回听本周录音，对比第 1 周录音', time:'10 min', hint:'你应该能听出明显进步了！' },
+          { text:'大声朗读本月所有收藏句子', time:'10 min', hint:'' }] }
+    ] },
+  { week:4, title:'巩固期 · 检验成果', focus:'BBC + VOA + Friends + 综合复习',
+    material:{ icon:'🎯', tag:'复习 + 检测', text:'轻听英语搜索「BBC 6 Minute English」+「Friends」' },
+    days:[
+      { day:'周一', topic:'What I do for fun', badge:'1.0x 速',
+        tasks:[
+          { text:'新一集 BBC 6 Minute English，原速盲听 + 逐句精听', time:'15 min', hint:'' },
+          { text:'手机录音：「What I do for fun」1 分钟', time:'10 min', hint:'用 In my free time, I... / I\'m really into...' },
+          { text:'收藏 5 个好句子', time:'5 min', hint:'' }] },
+      { day:'周二', topic:'My goals for next month', badge:'评分 > 85',
+        tasks:[
+          { text:'同一集，跟读测评挑战评分 > 85', time:'12 min', hint:'' },
+          { text:'手机录音：「My goals for next month」1 分钟', time:'10 min', hint:'用 I want to... / My goal is to...' },
+          { text:'仿造新句 × 5', time:'5 min', hint:'' },
+          { text:'尝试脱稿跟读', time:'3 min', hint:'' }] },
+      { day:'周三', topic:'A skill I want to learn', badge:'新集',
+        tasks:[
+          { text:'换新一集 BBC 6 Minute English', time:'15 min', hint:'' },
+          { text:'手机录音：「A skill I want to learn」1 分钟', time:'10 min', hint:'用 I\'ve always wanted to learn...' },
+          { text:'回听第 1 周录音，感受 4 周变化', time:'5 min', hint:'对比差距！' }] },
+      { day:'周四', topic:'综合跟读复习', badge:'复习',
+        tasks:[
+          { text:'从本月练过的 BBC 内容中选最喜欢的一集，重新跟读', time:'12 min', hint:'' },
+          { text:'跟读测评，挑战评分 > 90', time:'5 min', hint:'' },
+          { text:'手机录音：自由话题 2 分钟', time:'10 min', hint:'挑战说更久更流利' },
+          { text:'整理本月句库', time:'3 min', hint:'' }] },
+      { day:'周五', topic:'4/3/2 流利度训练', badge:'强化',
+        tasks:[
+          { text:'选一个熟悉的话题，4/3/2 训练（4 分钟→3 分钟→2 分钟）', time:'15 min', hint:'' },
+          { text:'轻听英语 → BBC 泛听一集', time:'5 min', hint:'' },
+          { text:'手机录音：用 2 分钟总结本周学习收获', time:'10 min', hint:'' }] },
+      { day:'周六', topic:'影视全片段', badge:'挑战',
+        tasks:[
+          { text:'轻听英语 → Friends 或 Modern Family，选 3 分钟完整片段', time:'准备', hint:'' },
+          { text:'逐句跟读 + 模仿 + 不看字幕配音', time:'15 min', hint:'' },
+          { text:'手机录音：完整配音一遍', time:'10 min', hint:'' },
+          { text:'自由话题自言自语 2 分钟', time:'5 min', hint:'' }] },
+      { day:'周日', topic:'第一阶段总结', badge:'里程碑 🎉',
+        tasks:[
+          { text:'回听第 1 天和第 28 天的录音，感受 4 周变化', time:'10 min', hint:'这是你最大的动力来源' },
+          { text:'轻听英语 → VOA 常速新闻泛听', time:'10 min', hint:'' },
+          { text:'写一段英语总结：这 4 周我学到了什么', time:'10 min', hint:'用英语写！' }] }
+    ] }
+];
+
+// ── STATE ────────────────────────────────
+const STORAGE_KEY = 'zaoshui_english_phase1';
+let state = {};
+function loadState() { try { const s = localStorage.getItem(STORAGE_KEY); if (s) state = JSON.parse(s); } catch(e) { state = {}; } }
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function getKey(w,d,t) { return `w${w}_d${d}_t${t}`; }
+function isDone(w,d,t) { return !!state[getKey(w,d,t)]; }
+function toggleTask(w,d,t) {
+  const k = getKey(w,d,t);
+  state[k] = state[k] ? (delete state[k], false) : (state[k]=true, true);
+  saveState(); renderAll();
+}
+function isDayDone(w,d) {
+  const week = weekData[w]; if (!week) return false;
+  const day = week.days[d]; if (!day) return false;
+  return day.tasks.every((_,t) => isDone(w,d,t));
+}
+function getProgress() {
+  let total=0, done=0;
+  weekData.forEach((w,wi) => w.days.forEach((d,di) => d.tasks.forEach((_,ti) => { total++; if (isDone(wi,di,ti)) done++; })));
+  return { total, done, pct: total>0 ? Math.round(done/total*100) : 0 };
+}
+
+// ── RENDER ───────────────────────────────
+function renderAll() { renderContent(); renderProgress(); renderTodayStatus(); }
+
+function renderContent() {
+  const c = document.getElementById('content'); let h = '';
+  weekData.forEach((week,wi) => {
+    const dd = week.days.filter((_,di) => isDayDone(wi,di)).length;
+    h += `<div class="week-section">`;
+    h += `<div class="week-header"><div class="week-num">W${week.week}</div><div class="week-info"><h3>${week.title}</h3><span>${week.focus}</span></div><div class="week-stats"><span>${dd}/7 天</span></div></div>`;
+    if (week.material) h += `<div class="week-material"><span class="mat-icon">${week.material.icon}</span><span class="mat-tag">${week.material.tag}</span><span>${week.material.text}</span></div>`;
+    week.days.forEach((day,di) => {
+      const done = isDayDone(wi,di);
+      h += `<div class="day-card${done?' completed':''}" id="day-w${wi}-d${di}">`;
+      h += `<div class="day-header"><div class="day-check${done?' checked':''}" onclick="toggleDay(${wi},${di})">✓</div><div class="day-label"><div class="day-name">${day.day}</div><div class="day-topic">🎯 ${day.topic}</div></div><div class="day-badge">${day.badge}</div></div>`;
+      h += `<ul class="task-list">`;
+      day.tasks.forEach((t,ti) => {
+        const td = isDone(wi,di,ti);
+        h += `<li class="task-item${td?' done':''}" onclick="toggleTask(${wi},${di},${ti})"><div class="task-checkbox${td?' checked':''}">✓</div><span class="task-text">${t.text}${t.hint?`<span class="task-hint">💡 ${t.hint}</span>`:''}</span>${t.time?`<span class="task-time">${t.time}</span>`:''}</li>`;
+      });
+      h += `</ul></div>`;
+    });
+    h += `</div>`;
+  });
+  c.innerHTML = h;
+}
+
+function renderProgress() {
+  const { pct } = getProgress();
+  document.getElementById('progressPct').textContent = pct+'%';
+  document.getElementById('progressBar').style.width = pct+'%';
+}
+
+function renderTodayStatus() {
+  const today = new Date();
+  const sd = getStartDate();
+  const days = Math.floor((today - sd)/(1000*60*60*24));
+  const wi = Math.floor(days/7), di = days%7;
+  let s = '';
+  if (wi>=0 && wi<4 && di>=0 && di<7) {
+    const w = weekData[wi], d = w.days[di];
+    s = `${isDayDone(wi,di)?'✅':'📋'} W${w.week} ${d.day} · ${d.topic}`;
+  } else if (wi>=4) { s = '🎉 第一阶段已完成！'; }
+  else { s = '📋 准备开始第 1 天'; }
+  document.getElementById('todayStatus').textContent = s;
+}
+
+function getStartDate() {
+  const saved = localStorage.getItem('zaoshui_start');
+  if (saved) return new Date(saved);
+  const now = new Date(); const day = now.getDay();
+  const diff = now.getDate() - day + (day===0?-6:1);
+  const mon = new Date(now.setDate(diff)); mon.setHours(0,0,0,0);
+  localStorage.setItem('zaoshui_start', mon.toISOString());
+  return mon;
+}
+
+function toggleDay(wi,di) {
+  const week = weekData[wi], day = week.days[di];
+  const allDone = isDayDone(wi,di);
+  day.tasks.forEach((_,ti) => { const k = getKey(wi,di,ti); allDone ? delete state[k] : (state[k]=true); });
+  saveState(); renderAll();
+  if (!allDone) { showToast(`✅ W${week.week} ${day.day} 全部完成！`);
+    const el = document.getElementById(`day-w${wi}-d${di}`);
+    if (el) { el.classList.add('pop'); setTimeout(()=>el.classList.remove('pop'),300); }
+  }
+}
+window.toggleTask = toggleTask; window.toggleDay = toggleDay;
+
+function showResetModal() { document.getElementById('resetModal').classList.add('active'); }
+function closeResetModal() { document.getElementById('resetModal').classList.remove('active'); }
+function resetAll() { state={}; localStorage.removeItem(STORAGE_KEY); localStorage.removeItem('zaoshui_start'); closeResetModal(); renderAll(); showToast('🔄 已重置所有进度'); }
+window.showResetModal = showResetModal; window.closeResetModal = closeResetModal; window.resetAll = resetAll;
+
+let toastTimer;
+function showToast(m) { const t = document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2000); }
+
+function requestNotification() {
+  if (!('Notification' in window)) { showToast('⚠️ 浏览器不支持通知'); return; }
+  if (Notification.permission === 'granted') { scheduleNotifications(); showToast('🔔 提醒已开启！08:50 & 21:00'); return; }
+  if (Notification.permission === 'denied') { showToast('⚠️ 通知已禁用，请在系统设置中开启'); return; }
+  Notification.requestPermission().then(p => { if (p==='granted') { scheduleNotifications(); showToast('🔔 提醒已开启！'); } else showToast('⚠️ 需要允许通知'); });
+}
+function scheduleNotifications() {
+  function check() {
+    const now = new Date(), h=now.getHours(), m=now.getMinutes(), today=now.toDateString();
+    if (h===8 && m===50) {
+      const last = localStorage.getItem('zaoshui_notify_am');
+      if (last !== today) { new Notification('🌅 英语口语 · 跟读时间', { body:'打开轻听英语，开始 15 分钟影子跟读吧 🎤', tag:'zaoshui-am' }); localStorage.setItem('zaoshui_notify_am', today); }
+    }
+    if (h===21 && m===0) {
+      const last = localStorage.getItem('zaoshui_notify_pm');
+      if (last !== today) { new Notification('🌙 英语口语 · 录音时间', { body:'打开手机录音机，说 1 分钟英语然后回听 📱', tag:'zaoshui-pm' }); localStorage.setItem('zaoshui_notify_pm', today); }
+    }
+  }
+  setInterval(check, 30000); check();
+}
+window.requestNotification = requestNotification;
+
+// ── Service Worker ────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
+
+// ── INIT ──────────────────────────────────
+function init() { loadState(); renderAll(); if ('Notification' in window && Notification.permission==='granted') scheduleNotifications(); }
+init();
+</script>
+</body>
+</html>
