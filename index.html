@@ -216,6 +216,56 @@
   .install-banner .inst-text strong { display:block; font-size:14px; margin-bottom:2px; }
   .install-banner .inst-close { font-size:18px; padding:4px; color:#888; cursor:pointer; background:none; border:none; }
 
+  /* ── Reading Page ── */
+  .reading-header { background: linear-gradient(135deg, #e8f5ee 0%, #d4ede0 100%); padding: 20px 16px 16px; border-bottom: 1px solid var(--border); }
+  .reading-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .reading-header h1 { font-size: 18px; font-weight: 700; color: var(--green-dark); }
+  .reading-date { font-size: 12px; color: var(--text-secondary); }
+  .reading-desc { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 12px; }
+  .reading-count { font-size: 13px; color: var(--text-secondary); }
+  .reading-count strong { color: var(--green); font-weight: 700; }
+
+  .article-card {
+    background: #fff; border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+    border: 1px solid var(--border); box-shadow: var(--shadow); cursor: pointer;
+    transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+  }
+  .article-card:active { transform: scale(0.98); background: #fafafa; }
+  .article-card .art-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .article-card .art-title { font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.4; }
+  .article-card .art-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: var(--green-light); color: var(--green); flex-shrink: 0; }
+  .article-card .art-trans { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+  .article-card .art-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #999; flex-wrap: wrap; }
+  .article-card .art-meta span { display: flex; align-items: center; gap: 3px; }
+
+  .article-detail {
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+  }
+  .article-detail.open { max-height: 1200px; }
+  .article-detail .detail-inner {
+    padding: 14px; background: #fafbfc; border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .article-detail .detail-text {
+    font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 14px;
+  }
+  .article-detail .detail-phrase-title { font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 6px; }
+  .article-detail .detail-phrases { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .article-detail .detail-phrases span {
+    font-size: 12px; background: var(--green-light); color: var(--green);
+    padding: 4px 10px; border-radius: 8px; font-weight: 500;
+  }
+  .article-detail .detail-chinese { font-size: 13px; color: var(--text-secondary); line-height: 1.6; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid var(--border); }
+  .article-detail .detail-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .article-detail .detail-actions button {
+    flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: #fff; font-size: 13px; cursor: pointer; color: var(--text-secondary);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .article-detail .detail-actions button.primary {
+    background: var(--green); color: #fff; border-color: var(--green); font-weight: 600;
+  }
+
   @keyframes popIn { 0% { transform:scale(0.8); opacity:0; } 100% { transform:scale(1); opacity:1; } }
   @keyframes slideDown { from { transform:translateY(-20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
   .pop { animation:popIn 0.3s ease; }
@@ -230,9 +280,10 @@
 <!-- ═══════════ TAB BAR ═══════════ -->
 <div class="tab-bar">
   <div class="tab-item active" data-tab="checklist"><span class="tab-icon">✅</span><span>每日清单</span></div>
-  <div class="tab-item" data-tab="materials"><span class="tab-icon">📀</span><span>学习素材</span></div>
-  <div class="tab-item" data-tab="methods"><span class="tab-icon">🧪</span><span>跟读方法</span></div>
-  <div class="tab-item" data-tab="plan"><span class="tab-icon">🗺️</span><span>全景计划</span></div>
+  <div class="tab-item" data-tab="reading"><span class="tab-icon">📖</span><span>英语学习</span></div>
+  <div class="tab-item" data-tab="materials"><span class="tab-icon">📀</span><span>素材库</span></div>
+  <div class="tab-item" data-tab="methods"><span class="tab-icon">🧪</span><span>方法</span></div>
+  <div class="tab-item" data-tab="plan"><span class="tab-icon">🗺️</span><span>全景</span></div>
 </div>
 
 <!-- ═══════════ PAGE 1: CHECKLIST ═══════════ -->
@@ -254,7 +305,20 @@
   <div class="content" id="content"></div>
 </div>
 
-<!-- ═══════════ PAGE 2: MATERIALS ═══════════ -->
+<!-- ═══════════ PAGE 2: READING ═══════════ -->
+<div class="tab-page" id="page-reading">
+  <div class="reading-header">
+    <div class="reading-title-row">
+      <h1>🌍 英语学习 · BBC 随身英语</h1>
+      <span class="reading-date" id="readingDate">2026年7月22日 星期二</span>
+    </div>
+    <p class="reading-desc">每天 30 分钟盲听练习。选一篇文章，用「阅读模式」切换译文，用底部播放器逐句朗读、调倍速、做单词训练。</p>
+    <div class="reading-count">共 <strong>28</strong> 篇文章，点选一篇开始阅读</div>
+  </div>
+  <div class="content" id="readingContent"></div>
+</div>
+
+<!-- ═══════════ PAGE 3: MATERIALS ═══════════ -->
 <div class="tab-page" id="page-materials">
   <div class="header">
     <span class="phase-badge">📀 素材库</span>
@@ -1043,8 +1107,76 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').catch(() => {});
 }
 
+// ── RENDER READING PAGE ─────────────────
+function renderReadingPage() {
+  const c = document.getElementById('readingContent');
+  if (!c) return;
+  let h = '';
+  readingData.forEach((r, i) => {
+    const wordCount = r.text.split(/\s+/).length;
+    const listenCount = localStorage.getItem('listen_' + i) || '0';
+    h += `<div class="article-card" onclick="toggleArticle(${i})">`;
+    h += `<div class="art-title-row"><span class="art-title">${r.title}</span><span class="art-tag">W${r.week}D${r.day}</span></div>`;
+    h += `<div class="art-trans">${r.chinese}</div>`;
+    h += `<div class="art-meta">`;
+    h += `<span>📝 ${wordCount} 词</span>`;
+    h += `<span>⏱️ ~${Math.ceil(wordCount/120)} 分钟</span>`;
+    h += `<span>🎯 ${r.phrases.length} 短语</span>`;
+    h += `<span>👂 已读 ${listenCount} 次</span>`;
+    h += `</div>`;
+    h += `<div class="article-detail" id="article-detail-${i}">`;
+    h += `<div class="detail-inner">`;
+    h += `<div class="detail-text">${r.text}</div>`;
+    h += `<div class="detail-phrase-title">🔑 Key Phrases</div>`;
+    h += `<div class="detail-phrases">${r.phrases.map(p => `<span>${p}</span>`).join('')}</div>`;
+    h += `<div class="detail-chinese">🇨🇳 ${r.chinese}</div>`;
+    h += `<div class="detail-actions">`;
+    h += `<button onclick="event.stopPropagation();markRead(${i})">✅ 标记已读</button>`;
+    h += `<button class="primary" onclick="event.stopPropagation();speakText(${i})">🔊 朗读全文</button>`;
+    h += `</div>`;
+    h += `</div></div>`;
+    h += `</div>`;
+  });
+  c.innerHTML = h;
+
+  // Update date
+  const now = new Date();
+  const days = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  document.getElementById('readingDate').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]}`;
+}
+
+function toggleArticle(i) {
+  const el = document.getElementById('article-detail-' + i);
+  if (el) el.classList.toggle('open');
+}
+window.toggleArticle = toggleArticle;
+
+function markRead(i) {
+  const key = 'listen_' + i;
+  const count = parseInt(localStorage.getItem(key) || '0') + 1;
+  localStorage.setItem(key, count);
+  renderReadingPage();
+  showToast(`✅ 已读 ${count} 次`);
+}
+window.markRead = markRead;
+
+function speakText(i) {
+  const r = readingData[i];
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(r.text);
+    u.lang = 'en-US';
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+    showToast('🔊 正在朗读...');
+  } else {
+    showToast('⚠️ 浏览器不支持语音朗读');
+  }
+}
+window.speakText = speakText;
+
 // ── INIT ──────────────────────────────────
-function init() { loadState(); renderAll(); if ('Notification' in window && Notification.permission==='granted') scheduleNotifications(); }
+function init() { loadState(); renderAll(); renderReadingPage(); if ('Notification' in window && Notification.permission==='granted') scheduleNotifications(); }
 init();
 </script>
 </body>
