@@ -266,6 +266,90 @@
     background: var(--green); color: #fff; border-color: var(--green); font-weight: 600;
   }
 
+  /* Clickable words in reading text */
+  .detail-text .word {
+    cursor: pointer; border-radius: 3px; padding: 1px 1px;
+    transition: background 0.15s; display: inline;
+  }
+  .detail-text .word:hover { background: #e8f5ee; }
+  .detail-text .word:active { background: #d4ede0; }
+  .detail-text .word.saved { background: #fff3cd; border-bottom: 2px solid #ffc107; }
+
+  /* Word popup */
+  .word-popup-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 300;
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; visibility: hidden; transition: all 0.25s;
+  }
+  .word-popup-overlay.active { opacity: 1; visibility: visible; }
+  .word-popup {
+    background: #fff; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0;
+    padding: 24px 20px calc(24px + var(--safe-bottom));
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .word-popup-overlay.active .word-popup { transform: translateY(0); }
+  .word-popup .popup-handle {
+    width: 36px; height: 4px; background: #ddd; border-radius: 2px; margin: 0 auto 16px;
+  }
+  .word-popup .popup-word {
+    font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .word-popup .popup-phonetic { font-size: 15px; color: var(--blue); font-style: italic; }
+  .word-popup .popup-speak-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--green-light); color: var(--green); font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .word-popup .popup-meaning {
+    font-size: 15px; color: #444; line-height: 1.7; margin: 12px 0 16px;
+    padding: 12px; background: #f9fafb; border-radius: 10px;
+  }
+  .word-popup .popup-actions { display: flex; gap: 10px; }
+  .word-popup .popup-actions button {
+    flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .word-popup .btn-add-word {
+    background: var(--green); color: #fff; border: none; font-weight: 600;
+  }
+  .word-popup .btn-add-word.added { background: #ccc; }
+  .word-popup .btn-close-popup {
+    background: #fff; color: var(--text-secondary); border: 1px solid var(--border);
+  }
+
+  /* Vocabulary book */
+  .vocab-fab {
+    position: fixed; bottom: calc(90px + var(--safe-bottom)); right: 16px;
+    width: 48px; height: 48px; border-radius: 50%; background: var(--green); color: #fff;
+    border: none; font-size: 22px; cursor: pointer; z-index: 50; box-shadow: 0 2px 12px rgba(45,154,107,0.4);
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .vocab-fab:active { transform: scale(0.92); }
+  .vocab-fab .vocab-badge {
+    position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px;
+    background: var(--red); color: #fff; font-size: 11px; font-weight: 700;
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
+  .vocab-list { padding: 16px; }
+  .vocab-item {
+    background: #fff; border-radius: var(--radius); padding: 14px; margin-bottom: 8px;
+    border: 1px solid var(--border); display: flex; align-items: flex-start; gap: 10px;
+  }
+  .vocab-item .vi-word { flex: 1; }
+  .vocab-item .vi-word .vi-en { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+  .vocab-item .vi-word .vi-phon { font-size: 13px; color: var(--blue); font-style: italic; margin-bottom: 4px; }
+  .vocab-item .vi-word .vi-mean { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .vocab-item .vi-actions { display: flex; flex-direction: column; gap: 6px; }
+  .vocab-item .vi-actions button {
+    width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border);
+    background: #fff; font-size: 15px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   @keyframes popIn { 0% { transform:scale(0.8); opacity:0; } 100% { transform:scale(1); opacity:1; } }
   @keyframes slideDown { from { transform:translateY(-20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
   .pop { animation:popIn 0.3s ease; }
@@ -1108,6 +1192,15 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── RENDER READING PAGE ─────────────────
+function makeClickableWords(text) {
+  const vocab = JSON.parse(localStorage.getItem('zaoshui_vocab') || '[]');
+  const vocabSet = new Set(vocab.map(v => v.word));
+  return text.replace(/([a-zA-Z][a-zA-Z']*)/g, (match) => {
+    const clean = match.toLowerCase().replace(/[^a-z']/g, '');
+    const saved = vocabSet.has(clean) ? ' saved' : '';
+    return `<span class="word${saved}" onclick="event.stopPropagation();lookupWord('${match}')">${match}</span>`;
+  });
+}
 function renderReadingPage() {
   const c = document.getElementById('readingContent');
   if (!c) return;
@@ -1126,7 +1219,7 @@ function renderReadingPage() {
     h += `</div>`;
     h += `<div class="article-detail" id="article-detail-${i}">`;
     h += `<div class="detail-inner">`;
-    h += `<div class="detail-text">${r.text}</div>`;
+    h += `<div class="detail-text">${makeClickableWords(r.text)}</div>`;
     h += `<div class="detail-phrase-title">🔑 Key Phrases</div>`;
     h += `<div class="detail-phrases">${r.phrases.map(p => `<span>${p}</span>`).join('')}</div>`;
     h += `<div class="detail-chinese">🇨🇳 ${r.chinese}</div>`;
@@ -1176,8 +1269,206 @@ function speakText(i) {
 window.speakText = speakText;
 
 // ── INIT ──────────────────────────────────
-function init() { loadState(); renderAll(); renderReadingPage(); if ('Notification' in window && Notification.permission==='granted') scheduleNotifications(); }
+function init() { loadState(); renderAll(); renderReadingPage(); updateVocabFab(); if ('Notification' in window && Notification.permission==='granted') scheduleNotifications(); }
 init();
 </script>
+<!-- Word Popup -->
+<div class="word-popup-overlay" id="wordPopupOverlay">
+  <div class="word-popup" onclick="event.stopPropagation()">
+    <div class="popup-handle"></div>
+    <div class="popup-word">
+      <span id="popupWord"></span>
+      <span class="popup-phonetic" id="popupPhonetic"></span>
+      <button class="popup-speak-btn" onclick="speakWord()">🔊</button>
+    </div>
+    <div class="popup-meaning" id="popupMeaning"></div>
+    <div class="popup-actions">
+      <button class="btn-add-word" id="popupAddBtn" onclick="addToVocab()">📒 加入生词本</button>
+      <button class="btn-close-popup" onclick="closeWordPopup()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Vocabulary FAB -->
+<button class="vocab-fab" id="vocabFab" onclick="openVocabBook()" style="display:none;">
+  📒<span class="vocab-badge" id="vocabBadge">0</span>
+</button>
+
+<!-- Vocabulary Book Modal -->
+<div class="modal-overlay" id="vocabModal">
+  <div class="modal" style="max-width:420px;width:92%;text-align:left;max-height:80vh;overflow-y:auto;">
+    <h3 style="text-align:center;">📒 生词本</h3>
+    <p style="text-align:center;font-size:12px;color:#999;margin-bottom:16px;" id="vocabCount">共 0 个单词</p>
+    <div id="vocabListContent"></div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-confirm" onclick="closeVocabBook()" style="flex:1;">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── WORD LOOKUP ─────────────────────────
+let currentWord = '';
+let currentWordClean = '';
+
+// Simple built-in dictionary (common words from the 28 passages)
+const miniDict = {};
+
+function lookupWord(word) {
+  const clean = word.toLowerCase().replace(/[^a-z']/g, '');
+  if (!clean) return null;
+  currentWord = word;
+  currentWordClean = clean;
+
+  // Show popup
+  document.getElementById('popupWord').textContent = clean;
+  document.getElementById('popupPhonetic').textContent = '';
+
+  // Try built-in dict first
+  let meaning = miniDict[clean];
+
+  // If not in built-in dict, fetch from free dictionary API
+  if (!meaning) {
+    document.getElementById('popupMeaning').innerHTML = '<span style="color:#999;">查询中...</span>';
+    fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(clean))
+      .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
+      .then(data => {
+        const entry = data[0];
+        const phon = entry.phonetic || (entry.phonetics && entry.phonetics.find(p => p.text) ? entry.phonetics.find(p => p.text).text : '');
+        const def = entry.meanings && entry.meanings[0] && entry.meanings[0].definitions && entry.meanings[0].definitions[0];
+        const meaningText = def ? def.definition : '暂无释义';
+        const pos = entry.meanings && entry.meanings[0] ? entry.meanings[0].partOfSpeech : '';
+
+        document.getElementById('popupPhonetic').textContent = phon || '';
+        document.getElementById('popupMeaning').innerHTML =
+          (pos ? `<span style="color:var(--green);font-size:12px;font-weight:600;">${pos}</span><br>` : '') +
+          meaningText;
+
+        // Cache it
+        miniDict[clean] = { phonetic: phon, meaning: (pos ? '(' + pos + ') ' : '') + meaningText };
+        updateAddButton();
+      })
+      .catch(() => {
+        document.getElementById('popupMeaning').innerHTML = '<span style="color:#999;">未找到释义，可手动加入生词本</span>';
+      });
+  } else {
+    const m = typeof meaning === 'string' ? meaning : meaning.meaning;
+    const p = typeof meaning === 'string' ? '' : meaning.phonetic;
+    document.getElementById('popupPhonetic').textContent = p || '';
+    document.getElementById('popupMeaning').textContent = m;
+  }
+
+  updateAddButton();
+  document.getElementById('wordPopupOverlay').classList.add('active');
+}
+
+function updateAddButton() {
+  const vocab = JSON.parse(localStorage.getItem('zaoshui_vocab') || '[]');
+  const exists = vocab.some(v => v.word === currentWordClean);
+  const btn = document.getElementById('popupAddBtn');
+  if (exists) { btn.textContent = '✅ 已在生词本'; btn.classList.add('added'); }
+  else { btn.textContent = '📒 加入生词本'; btn.classList.remove('added'); }
+}
+
+function speakWord() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(currentWordClean);
+    u.lang = 'en-US'; u.rate = 0.8;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function addToVocab() {
+  const vocab = JSON.parse(localStorage.getItem('zaoshui_vocab') || '[]');
+  if (vocab.some(v => v.word === currentWordClean)) {
+    showToast('⚠️ 已在生词本中');
+    return;
+  }
+  const phonetic = document.getElementById('popupPhonetic').textContent || '';
+  const meaning = document.getElementById('popupMeaning').textContent || '';
+  vocab.push({ word: currentWordClean, phonetic, meaning, date: Date.now() });
+  localStorage.setItem('zaoshui_vocab', JSON.stringify(vocab));
+  updateAddButton();
+  updateVocabFab();
+  showToast('✅ 已加入生词本');
+}
+
+function closeWordPopup() {
+  document.getElementById('wordPopupOverlay').classList.remove('active');
+}
+
+// Close popup on overlay click
+document.getElementById('wordPopupOverlay').addEventListener('click', closeWordPopup);
+
+// ── VOCAB BOOK ──────────────────────────
+function updateVocabFab() {
+  const vocab = JSON.parse(localStorage.getItem('zaoshui_vocab') || '[]');
+  const fab = document.getElementById('vocabFab');
+  const badge = document.getElementById('vocabBadge');
+  if (vocab.length > 0) {
+    fab.style.display = 'flex';
+    badge.textContent = vocab.length;
+  } else {
+    fab.style.display = 'none';
+  }
+}
+
+function openVocabBook() {
+  const vocab = JSON.parse(localStorage.getItem('zaoshui_vocab') || '[]');
+  document.getElementById('vocabCount').textContent = '共 ' + vocab.length + ' 个单词';
+  let h = '';
+  if (vocab.length === 0) {
+    h = '<p style="text-align:center;color:#999;padding:20px 0;font-size:14px;">生词本为空<br>阅读时点击单词即可添加</p>';
+  } else {
+    vocab.forEach((v, i) => {
+      h += `<div class="vocab-item">`;
+      h += `<div class="vi-word"><div class="vi-en">${v.word}</div>`;
+      if (v.phonetic) h += `<div class="vi-phon">${v.phonetic}</div>`;
+      h += `<div class="vi-mean">${v.meaning || '暂无释义'}</div></div>`;
+      h += `<div class="vi-actions">`;
+      h += `<button onclick="speakVocabWord(${i})">🔊</button>`;
+      h += `<button onclick="removeVocabWord(${i})" style="color:var(--red);">✕</button>`;
+      h += `</div></div>`;
+    });
+  }
+  document.getElementById('vocabListContent').innerHTML = h;
+  document.getElementById('vocabModal').classList.add('active');
+}
+
+function closeVocabBook() {
+  document.getElementById('vocabModal').classList.remove('active');
+}
+
+function speakVocabWord(i) {
+  const vocab = JSON.parse(localStorage.getItem('zaoshui_vocab') || '[]');
+  if (!vocab[i]) return;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(vocab[i].word);
+    u.lang = 'en-US'; u.rate = 0.8;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function removeVocabWord(i) {
+  let vocab = JSON.parse(localStorage.getItem('zaoshui_vocab') || '[]');
+  vocab.splice(i, 1);
+  localStorage.setItem('zaoshui_vocab', JSON.stringify(vocab));
+  openVocabBook();
+  updateVocabFab();
+  showToast('🗑️ 已删除');
+}
+
+window.lookupWord = lookupWord;
+window.speakWord = speakWord;
+window.addToVocab = addToVocab;
+window.closeWordPopup = closeWordPopup;
+window.openVocabBook = openVocabBook;
+window.closeVocabBook = closeVocabBook;
+window.speakVocabWord = speakVocabWord;
+window.removeVocabWord = removeVocabWord;
+</script>
+
 </body>
 </html>
