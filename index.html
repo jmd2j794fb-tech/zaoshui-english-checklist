@@ -377,12 +377,148 @@
   /* Reading passage expand */
   .reading-toggle.open span:last-child { transform: rotate(180deg); }
   .reading-toggle.open + .reading-body { max-height: 800px !important; }
+
+  /* ── Drawer / Sidebar ── */
+  .drawer-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 150;
+    opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .drawer-overlay.active { opacity: 1; visibility: visible; }
+  .drawer {
+    position: fixed; top: 0; left: 0; width: 260px; height: 100%; height: 100dvh;
+    background: #fff; z-index: 160; transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column; box-shadow: none;
+  }
+  .drawer.active { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.08); }
+  .drawer-header {
+    padding: 44px 20px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .drawer-avatar {
+    width: 42px; height: 42px; border-radius: 12px; background: var(--green);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; flex-shrink: 0;
+  }
+  .drawer-header .dh-info h3 { font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .drawer-header .dh-info span { font-size: 12px; color: var(--text-secondary); }
+  .drawer-menu { flex: 1; overflow-y: auto; padding: 8px 0; -webkit-overflow-scrolling: touch; }
+  .drawer-menu .dm-section-label {
+    font-size: 11px; color: #bbb; text-transform: uppercase; letter-spacing: 1px;
+    padding: 12px 20px 6px; font-weight: 500;
+  }
+  .dm-item {
+    display: flex; align-items: center; gap: 12px; padding: 13px 20px; cursor: pointer;
+    transition: all 0.15s; font-size: 15px; color: #444; position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dm-item:active { transform: scale(0.97); background: #f9f9f9; }
+  .dm-item .dm-icon { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; }
+  .dm-item .dm-label { flex: 1; font-weight: 400; }
+  .dm-item .dm-badge {
+    font-size: 10px; background: #f0f0f0; color: #999; padding: 2px 8px;
+    border-radius: 10px; font-weight: 500; white-space: nowrap;
+  }
+  .dm-item.active { background: var(--green-light); color: var(--green); font-weight: 600; }
+  .dm-item.active .dm-badge { background: var(--green); color: #fff; }
+  .drawer-footer {
+    padding: 12px 20px; border-top: 1px solid var(--border);
+    padding-bottom: calc(12px + var(--safe-bottom));
+    display: flex; align-items: center; gap: 8px;
+  }
+  .drawer-footer .df-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(1.3);} }
+  .drawer-footer .df-text { font-size: 13px; color: var(--text-secondary); }
+
+  /* Hamburger button in tab bar */
+  .hamburger-btn {
+    width: 36px; height: 36px; border-radius: 10px; background: #f5f5f5; border: none;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 4px; padding: 0; flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent; margin: 6px 0 6px 8px;
+  }
+  .hamburger-btn span {
+    display: block; width: 18px; height: 2px; background: #555; border-radius: 1px;
+    transition: all 0.3s;
+  }
+  .hamburger-btn:active { background: #eee; }
+
+  /* Drawer content pages */
+  .drawer-page { display: none; }
+  .drawer-page.active {
+    display: block; position: fixed; inset: 0; z-index: 200; background: var(--bg);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .drawer-page-header {
+    background: linear-gradient(135deg, #1a3a2a 0%, #2d6a4f 50%, #1b4332 100%);
+    color: #fff; padding: 20px 16px; position: sticky; top: 0; z-index: 5;
+  }
+  .drawer-page-header .dph-back {
+    display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.8);
+    margin-bottom: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .drawer-page-header h2 { font-size: 18px; font-weight: 700; }
+  .drawer-page-header .dph-date { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+  .drawer-page-body { padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .drawer-content-card {
+    background: #fff; border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+    border: 1px solid var(--border); box-shadow: var(--shadow);
+  }
+  .drawer-content-card .dcc-tag {
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 8px;
+    background: var(--green-light); color: var(--green); display: inline-block; margin-bottom: 8px;
+  }
+  .drawer-content-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+  .drawer-content-card p { font-size: 13px; color: #555; line-height: 1.7; }
+  .drawer-content-card .dcc-meta { font-size: 11px; color: #999; margin-top: 8px; display: flex; gap: 10px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
 
+<!-- ═══════════ DRAWER OVERLAY ═══════════ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- ═══════════ LEFT DRAWER ═══════════ -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-avatar">🌙</div>
+    <div class="dh-info"><h3>早睡</h3><span>英语口语学习 · 创作工作台</span></div>
+  </div>
+  <div class="drawer-menu">
+    <div class="dm-section-label">📋 导航</div>
+    <div class="dm-item active" data-drawer="plan" onclick="openDrawerPage('plan')">
+      <span class="dm-icon">✅</span><span class="dm-label">每日计划</span>
+      <span class="dm-badge">今日</span>
+    </div>
+    <div class="dm-section-label" style="margin-top:4px;">💡 每日灵感</div>
+    <div class="dm-item" data-drawer="topics" onclick="openDrawerPage('topics')">
+      <span class="dm-icon">🎬</span><span class="dm-label">视频选题灵感</span>
+      <span class="dm-badge">NEW</span>
+    </div>
+    <div class="dm-item" data-drawer="dewustyle" onclick="openDrawerPage('dewustyle')">
+      <span class="dm-icon">👟</span><span class="dm-label">得物爆款复盘</span>
+      <span class="dm-badge">热</span>
+    </div>
+    <div class="dm-item" data-drawer="themes" onclick="openDrawerPage('themes')">
+      <span class="dm-icon">🔥</span><span class="dm-label">热门主题活动</span>
+      <span class="dm-badge">NEW</span>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <span class="df-dot"></span>
+    <span class="df-text">内容每日自动更新 · 坚持打卡</span>
+  </div>
+</div>
+
 <!-- ═══════════ TAB BAR ═══════════ -->
 <div class="tab-bar">
+  <button class="hamburger-btn" onclick="openDrawer()" aria-label="菜单">
+    <span></span><span></span><span></span>
+  </button>
   <div class="tab-item active" data-tab="checklist"><span class="tab-icon">✅</span><span>每日清单</span></div>
   <div class="tab-item" data-tab="reading"><span class="tab-icon">📖</span><span>英语学习</span></div>
   <div class="tab-item" data-tab="materials"><span class="tab-icon">📀</span><span>素材库</span></div>
@@ -850,6 +986,34 @@
       <button class="btn-confirm" onclick="resetAll()">确认重置</button>
     </div>
   </div>
+</div>
+
+<!-- ═══════════ DRAWER CONTENT PAGES ═══════════ -->
+<div class="drawer-page" id="drawer-page-topics">
+  <div class="drawer-page-header">
+    <div class="dph-back" onclick="closeDrawerPage()">← 返回菜单</div>
+    <h2>🎬 视频选题灵感</h2>
+    <div class="dph-date" id="topicsDate"></div>
+  </div>
+  <div class="drawer-page-body" id="topicsContent"></div>
+</div>
+
+<div class="drawer-page" id="drawer-page-dewustyle">
+  <div class="drawer-page-header">
+    <div class="dph-back" onclick="closeDrawerPage()">← 返回菜单</div>
+    <h2>👟 得物爆款复盘</h2>
+    <div class="dph-date" id="dewustyleDate"></div>
+  </div>
+  <div class="drawer-page-body" id="dewustyleContent"></div>
+</div>
+
+<div class="drawer-page" id="drawer-page-themes">
+  <div class="drawer-page-header">
+    <div class="dph-back" onclick="closeDrawerPage()">← 返回菜单</div>
+    <h2>🔥 热门主题活动</h2>
+    <div class="dph-date" id="themesDate"></div>
+  </div>
+  <div class="drawer-page-body" id="themesContent"></div>
 </div>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
@@ -1333,6 +1497,255 @@ function speakText(i) {
 window.speakText = speakText;
 window.setSpeed = setSpeed;
 window.togglePlay = togglePlay;
+
+// ── DRAWER NAVIGATION ────────────────────
+function openDrawer() {
+  document.getElementById('drawer').classList.add('active');
+  document.getElementById('drawerOverlay').classList.add('active');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('active');
+  document.getElementById('drawerOverlay').classList.remove('active');
+}
+window.openDrawer = openDrawer;
+window.closeDrawer = closeDrawer;
+
+let currentDrawerPage = null;
+function openDrawerPage(pageId) {
+  currentDrawerPage = pageId;
+  // Update active menu item
+  document.querySelectorAll('.dm-item').forEach(el => el.classList.remove('active'));
+  const menuItem = document.querySelector(`.dm-item[data-drawer="${pageId}"]`);
+  if (menuItem) menuItem.classList.add('active');
+  // For "每日计划", just close drawer and go to checklist tab
+  if (pageId === 'plan') {
+    closeDrawer();
+    // Switch to checklist tab
+    document.querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-page').forEach(x => x.classList.remove('active'));
+    const checklistTab = document.querySelector('.tab-item[data-tab="checklist"]');
+    if (checklistTab) checklistTab.classList.add('active');
+    document.getElementById('page-checklist').classList.add('active');
+    return;
+  }
+  // For content pages, show the drawer page overlay
+  const pageEl = document.getElementById('drawer-page-' + pageId);
+  if (!pageEl) return;
+  // Hide all drawer pages
+  document.querySelectorAll('.drawer-page').forEach(p => p.classList.remove('active'));
+  pageEl.classList.add('active');
+  // Render content based on page
+  renderDrawerContent(pageId);
+}
+function closeDrawerPage() {
+  document.querySelectorAll('.drawer-page').forEach(p => p.classList.remove('active'));
+  currentDrawerPage = null;
+  document.querySelectorAll('.dm-item').forEach(el => el.classList.remove('active'));
+  document.querySelector('.dm-item[data-drawer="plan"]').classList.add('active');
+}
+window.openDrawerPage = openDrawerPage;
+window.closeDrawerPage = closeDrawerPage;
+
+// Swipe gesture to open drawer
+let touchStartX = 0;
+document.addEventListener('touchstart', function(e) {
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.addEventListener('touchend', function(e) {
+  const diff = e.changedTouches[0].clientX - touchStartX;
+  if (diff > 60 && touchStartX < 30 && !currentDrawerPage) {
+    openDrawer();
+  }
+});
+
+// ── DAILY CONTENT GENERATORS ────────────
+function getTodaySeed() {
+  const now = new Date();
+  return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+}
+
+// 视频选题灵感
+const topicData = {
+  categories: ['英语学习Vlog', '日常口语挑战', '留学/旅行英语', '美剧名场面拆解', '英语面试技巧', '英语冷知识', '发音对比教学', '情景对话模拟', '英文歌学英语', '30天打卡记录'],
+  formats: ['30秒快剪', '1分钟教程', '沉浸式跟读', '对比测评', '情景再现', '一人分饰两角', '配音挑战', '干货合集'],
+  hooks: ['你知道吗？', '99%的人都读错了...', '出国才知道的英语...', '这样练口语超有效！', '老外听了都懵...', '英语渣逆袭系列', '每天1分钟，开口不尴尬'],
+  platforms: ['小红书', '抖音', 'B站', '视频号', 'YouTube Shorts']
+};
+
+function generateTopics() {
+  const seed = getTodaySeed();
+  const rng = (max) => {
+    let s = seed;
+    return (idx) => {
+      s = (s * 1103515245 + 12345) & 0x7fffffff;
+      return s % max;
+    };
+  };
+  const r = rng(1000);
+  const items = [];
+  for (let i = 0; i < 6; i++) {
+    const cat = topicData.categories[(seed + i * 7) % topicData.categories.length];
+    const fmt = topicData.formats[(seed + i * 13) % topicData.formats.length];
+    const hook = topicData.hooks[(seed + i * 17) % topicData.hooks.length];
+    const plat = topicData.platforms[(seed + i * 11) % topicData.platforms.length];
+    const titles = [
+      `「${hook}」${cat} — ${fmt}`,
+      `${cat} | ${fmt} | ${hook}`,
+      `${hook} 挑战${cat}第${(seed%30)+1}天`
+    ];
+    items.push({
+      title: titles[i % 3],
+      tag: cat,
+      desc: `适合${plat}发布。拍摄建议：${fmt}形式，突出「${hook}」的钩子效果，前3秒用对比或悬念抓住注意力。预计互动率：${['高','中高','爆款潜质'][(seed+i)%3]}`,
+      platform: plat,
+      difficulty: ['⭐', '⭐⭐', '⭐⭐⭐'][(seed+i)%3]
+    });
+  }
+  return items;
+}
+
+// 得物爆款复盘
+const dewustyleData = {
+  categories: ['球鞋', '潮牌服饰', '配饰手表', '数码潮玩', '美妆护肤', '运动装备'],
+  trends: ['复古回潮', '联名限定', '明星同款', '小众设计师', '可持续时尚', '机能风', 'Clean Fit', 'Y2K千禧风'],
+  insights: [
+    '关注评论区高频关键词，挖掘真实需求',
+    '对比新旧版本差异点，突出升级细节',
+    '搭配场景化穿搭展示，增加种草力',
+    '加入价格走势分析，体现专业度',
+    '用开箱第一视角增加真实感',
+    '对比平替与正品的细节差异',
+    '加入穿搭公式，降低用户决策门槛',
+    '盘点近期二级市场价格波动'
+  ]
+};
+
+function generateDewustyle() {
+  const seed = getTodaySeed();
+  const items = [];
+  for (let i = 0; i < 5; i++) {
+    const cat = dewustyleData.categories[(seed + i * 9) % dewustyleData.categories.length];
+    const trend = dewustyleData.trends[(seed + i * 11) % dewustyleData.trends.length];
+    const insight = dewustyleData.insights[(seed + i * 7) % dewustyleData.insights.length];
+    const heat = ['🔥', '🔥🔥', '💣'][(seed+i*3)%3];
+    const prices = ['¥899-1299', '¥1599-2499', '¥599-999', '¥2999-4999', '¥199-599'];
+    items.push({
+      title: `${heat} ${cat} · ${trend}风向标`,
+      tag: cat,
+      desc: `当前${trend}趋势下，${cat}品类在得物搜索量周环比${['+23%','+45%','+18%','+67%','+31%'][(seed+i)%5]}。${insight}。建议价格区间：${prices[i%5]}`,
+      trend: trend,
+      heat: heat
+    });
+  }
+  return items;
+}
+
+// 热门主题活动
+const themeData = {
+  themes: [
+    { name: '30天英语口语打卡挑战', icon: '📅', desc: '每天发布一段英语录音，坚持30天赢徽章。适合英语学习赛道，评论区互相纠音互动。' },
+    { name: '一周穿搭不重样', icon: '👔', desc: '7天7套搭配，展示个人风格。适合穿搭/潮流博主，配合得物好物链接。' },
+    { name: '开箱测评接力赛', icon: '📦', desc: '新入手好物第一视角开箱，测评接力。适合数码/潮玩/美妆赛道。' },
+    { name: '冷知识科普系列', icon: '🧠', desc: '每天一个你不知道的冷知识，15-30秒短视频。知识类账号涨粉利器。' },
+    { name: '城市探店地图', icon: '📍', desc: '每周打卡一家新店，美食/咖啡/买手店。本地生活赛道持续热门。' },
+    { name: '好物平替大比拼', icon: '⚖️', desc: '大牌vs平替实拍对比，帮粉丝省钱。得物热门内容方向。' },
+    { name: 'Vlog我的日常', icon: '🎥', desc: '记录一天的真实生活，不需要剧本。真实感是2026年最大流量密码。' },
+    { name: '读书/学习打卡社群', icon: '📚', desc: '加入学习社群，每天分享读书笔记或学习进度。自律类内容持续增长。' },
+    { name: '翻包记/What\'s in my bag', icon: '🎒', desc: '展示包包里每天带什么。轻量级内容，制作成本低互动高。' },
+    { name: 'Before/After 改造', icon: '✨', desc: '穿搭改造、房间改造、妆容改造。视觉冲击力强，传播效果好。' },
+    { name: '一周英语Vlog挑战', icon: '🌍', desc: '用英语记录一周生活，沉浸式英语环境。学习博主热门选题。' },
+    { name: '联名款抢先看', icon: '🔍', desc: '最新联名资讯+入手攻略。得物用户最关心的内容方向之一。' }
+  ],
+  tips: [
+    '发布时加上热门话题标签，曝光提升3-5倍',
+    '前3秒用「反问」或「悬念」抓住用户',
+    '封面图用对比色+大号文字，点击率更高',
+    '发布时间建议：工作日12:00-14:00或20:00-22:00',
+    '评论区主动引导互动，如「你们觉得呢？」',
+    '持续参与同一主题活动，算法会给你更多推荐'
+  ]
+};
+
+function generateThemes() {
+  const seed = getTodaySeed();
+  const items = [];
+  // Pick 4 themes
+  const picked = new Set();
+  while (picked.size < 4) {
+    picked.add((seed * (picked.size+1) * 7 + picked.size * 13) % themeData.themes.length);
+  }
+  const pickedArr = Array.from(picked);
+  pickedArr.forEach((ti, i) => {
+    const theme = themeData.themes[ti];
+    const tip = themeData.tips[(seed + i * 5) % themeData.tips.length];
+    items.push({
+      name: theme.name,
+      icon: theme.icon,
+      desc: theme.desc,
+      tip: tip,
+      heat: ['本周热门', '持续热门', '新兴趋势', '爆款预定'][(seed+i)%4]
+    });
+  });
+  return items;
+}
+
+function formatTodayCN() {
+  const now = new Date();
+  const weekDays = ['日','一','二','三','四','五','六'];
+  return `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${weekDays[now.getDay()]}`;
+}
+
+function renderDrawerContent(pageId) {
+  const dateStr = formatTodayCN();
+  if (pageId === 'topics') {
+    document.getElementById('topicsDate').textContent = '📅 ' + dateStr + ' · 每日更新';
+    const items = generateTopics();
+    let h = '';
+    items.forEach((item, i) => {
+      h += `<div class="drawer-content-card">
+        <span class="dcc-tag">${item.tag}</span>
+        <h4>${item.title}</h4>
+        <p>${item.desc}</p>
+        <div class="dcc-meta">
+          <span>📱 ${item.platform}</span>
+          <span>难度 ${item.difficulty}</span>
+          <span>💡 选题 #${i+1}</span>
+        </div>
+      </div>`;
+    });
+    document.getElementById('topicsContent').innerHTML = h;
+  } else if (pageId === 'dewustyle') {
+    document.getElementById('dewustyleDate').textContent = '📅 ' + dateStr + ' · 每日更新';
+    const items = generateDewustyle();
+    let h = '';
+    items.forEach((item, i) => {
+      h += `<div class="drawer-content-card">
+        <span class="dcc-tag">${item.tag}</span>
+        <h4>${item.title}</h4>
+        <p>${item.desc}</p>
+        <div class="dcc-meta">
+          <span>🏷️ ${item.trend}</span>
+          <span>热度 ${item.heat}</span>
+        </div>
+      </div>`;
+    });
+    document.getElementById('dewustyleContent').innerHTML = h;
+  } else if (pageId === 'themes') {
+    document.getElementById('themesDate').textContent = '📅 ' + dateStr + ' · 每日更新';
+    const items = generateThemes();
+    let h = '';
+    items.forEach((item, i) => {
+      h += `<div class="drawer-content-card">
+        <span class="dcc-tag">${item.heat}</span>
+        <h4>${item.icon} ${item.name}</h4>
+        <p>${item.desc}</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--green);background:var(--green-light);padding:8px 10px;border-radius:8px;">💡 运营建议：${item.tip}</p>
+        <div class="dcc-meta"><span>📌 活动 #${i+1}</span></div>
+      </div>`;
+    });
+    document.getElementById('themesContent').innerHTML = h;
+  }
+}
 
 // ── INIT ──────────────────────────────────
 function init() { loadState(); renderAll(); renderReadingPage(); updateVocabFab(); if ('Notification' in window && Notification.permission==='granted') scheduleNotifications(); }
