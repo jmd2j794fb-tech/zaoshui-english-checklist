@@ -1546,15 +1546,42 @@ function closeDrawerPage() {
 window.openDrawerPage = openDrawerPage;
 window.closeDrawerPage = closeDrawerPage;
 
-// Swipe gesture to open drawer
-let touchStartX = 0;
+// Swipe gestures: right-swipe from left edge opens drawer, left-swipe closes drawer/page
+let touchStartX = 0, touchStartY = 0;
 document.addEventListener('touchstart', function(e) {
   touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
 }, { passive: true });
 document.addEventListener('touchend', function(e) {
-  const diff = e.changedTouches[0].clientX - touchStartX;
-  if (diff > 60 && touchStartX < 30 && !currentDrawerPage) {
-    openDrawer();
+  const endX = e.changedTouches[0].clientX;
+  const endY = e.changedTouches[0].clientY;
+  const diffX = endX - touchStartX;
+  const diffY = endY - touchStartY;
+  // Ignore mostly-vertical swipes (scrolling)
+  if (Math.abs(diffY) > Math.abs(diffX)) return;
+
+  // Right-swipe from left edge → open drawer (only if drawer closed and no content page)
+  if (diffX > 60 && touchStartX < 30 && !currentDrawerPage) {
+    const drawer = document.getElementById('drawer');
+    if (!drawer.classList.contains('active')) {
+      openDrawer();
+      return;
+    }
+  }
+
+  // Left-swipe → close things
+  if (diffX < -60) {
+    // If a drawer content page is open, close it
+    if (currentDrawerPage) {
+      closeDrawerPage();
+      return;
+    }
+    // If drawer is open, close it
+    const drawer = document.getElementById('drawer');
+    if (drawer.classList.contains('active')) {
+      closeDrawer();
+      return;
+    }
   }
 });
 
