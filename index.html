@@ -507,6 +507,10 @@
       <span class="dm-icon">🔥</span><span class="dm-label">热门主题活动</span>
       <span class="dm-badge">NEW</span>
     </div>
+    <div class="dm-item" data-drawer="accessory" onclick="openDrawerPage('accessory')">
+      <span class="dm-icon">💍</span><span class="dm-label">饰品热门标题</span>
+      <span class="dm-badge">热</span>
+    </div>
   </div>
   <div class="drawer-footer">
     <span class="df-dot"></span>
@@ -1014,6 +1018,15 @@
     <div class="dph-date" id="themesDate"></div>
   </div>
   <div class="drawer-page-body" id="themesContent"></div>
+</div>
+
+<div class="drawer-page" id="drawer-page-accessory">
+  <div class="drawer-page-header">
+    <div class="dph-back" onclick="closeDrawerPage()">← 返回菜单</div>
+    <h2>💍 饰品热门标题</h2>
+    <div class="dph-date" id="accessoryDate"></div>
+  </div>
+  <div class="drawer-page-body" id="accessoryContent"></div>
 </div>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
@@ -1722,6 +1735,72 @@ function formatTodayCN() {
   return `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${weekDays[now.getDay()]}`;
 }
 
+// 饰品热门标题
+const accessoryData = {
+  categories: ['项链', '手链', '耳饰', '戒指', '胸针', '发饰', '脚链', '手机链', '包包挂件', '墨镜'],
+  styles: ['复古风', '极简风', 'Y2K千禧', '法式浪漫', '日系甜美', '欧美辣妹', '中式国风', 'ins风', '韩系清新', '暗黑机能'],
+  materials: ['925银', '钛钢', '18K镀金', '天然珍珠', '施华洛水晶', '和田玉', '琥珀', '贝壳', '编织绳', '珐琅'],
+  titleTemplates: [
+    '{style}{category}推荐｜戴上就不想摘的小众好物',
+    '不到百元！{material}{category}平替大牌，质感绝了',
+    '{category}这样选才不踩雷｜{style}女生必看',
+    '被问疯了！这{count}款{category}谁戴谁好看',
+    '{style}必备{category}清单｜每一款都想拥有',
+    '小众设计师{category}｜{material}质感拉满',
+    '闺蜜疯狂追问的{category}｜{style}天花板',
+    '学生党也能入！{material}{category}百元内搞定',
+    '一秒提升穿搭质感！{style}{category}合集',
+    '{category}界的宝藏店铺｜好看到犯规',
+    '被路人要链接的{category}｜{style}yyds',
+    '夏日必备{category}｜{material}不过敏超安心',
+    '{count}款{style}{category}横向测评｜哪款最值',
+    '职场穿搭必备{category}｜低调又有质感',
+    '约会必戴{category}｜他一直盯着看',
+  ],
+  hooks: ['绝绝子', '谁懂啊', '真的会谢', '被问爆了', '疯狂心动', '一整个爱住', '按头安利', '不允许还有人不知道'],
+  platforms: ['小红书', '抖音', '得物', '微博', 'B站'],
+  tips: [
+    '封面用饰品佩戴实拍图，比白底图点击率高3倍',
+    '标题带「平替」「百元内」等价格关键词，吸引学生党',
+    '发布时加上饰品材质标签，如#925银 #不过敏，提升搜索曝光',
+    '搭配穿搭场景展示，让用户有代入感',
+    '前3秒展示佩戴效果特写，突出饰品质感',
+    '评论区主动回复材质和价格，提高互动率',
+    '可拍「开箱+佩戴+搭配」三段式内容，完播率更高',
+    '带#小众饰品 #饰品推荐 话题标签，蹭平台流量'
+  ]
+};
+
+function generateAccessory() {
+  const seed = getTodaySeed();
+  const items = [];
+  for (let i = 0; i < 6; i++) {
+    const cat = accessoryData.categories[(seed + i * 7) % accessoryData.categories.length];
+    const style = accessoryData.styles[(seed + i * 11) % accessoryData.styles.length];
+    const material = accessoryData.materials[(seed + i * 13) % accessoryData.materials.length];
+    const tpl = accessoryData.titleTemplates[(seed + i * 17) % accessoryData.titleTemplates.length];
+    const hook = accessoryData.hooks[(seed + i * 5) % accessoryData.hooks.length];
+    const platform = accessoryData.platforms[(seed + i * 3) % accessoryData.platforms.length];
+    const tip = accessoryData.tips[(seed + i * 19) % accessoryData.tips.length];
+    const count = (seed % 5) + 3; // 3~7
+
+    const title = tpl
+      .replace('{style}', style)
+      .replace('{category}', cat)
+      .replace('{material}', material)
+      .replace('{count}', count);
+
+    items.push({
+      title: title,
+      tag: cat + ' · ' + style,
+      desc: `适合${platform}发布。${material}材质，${style}风格。钩子词「${hook}」吸引点击。${tip}`,
+      platform: platform,
+      heat: ['🔥 爆款', '🔥 热门', '💎 精选', '📈 上升'][(seed + i) % 4]
+    });
+  }
+  return items;
+}
+
 function renderDrawerContent(pageId) {
   const dateStr = formatTodayCN();
   if (pageId === 'topics') {
@@ -1771,6 +1850,23 @@ function renderDrawerContent(pageId) {
       </div>`;
     });
     document.getElementById('themesContent').innerHTML = h;
+  } else if (pageId === 'accessory') {
+    document.getElementById('accessoryDate').textContent = '📅 ' + dateStr + ' · 每日更新';
+    const items = generateAccessory();
+    let h = '';
+    items.forEach((item, i) => {
+      h += `<div class="drawer-content-card">
+        <span class="dcc-tag">${item.tag}</span>
+        <h4>${item.title}</h4>
+        <p>${item.desc}</p>
+        <div class="dcc-meta">
+          <span>📱 ${item.platform}</span>
+          <span>${item.heat}</span>
+          <span>💡 标题 #${i+1}</span>
+        </div>
+      </div>`;
+    });
+    document.getElementById('accessoryContent').innerHTML = h;
   }
 }
 
